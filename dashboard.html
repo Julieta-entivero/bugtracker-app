@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BugTracker - Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="navbar-left">
+            <h2 class="navbar-brand">BugTracker</h2>
+        </div>
+        <div class="navbar-right">
+            <span class="user-info" id="user-info"></span>
+            <button class="btn btn-sm btn-outline" id="logout-btn">Cerrar Sesion</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+
+        <div class="stats-row" id="stats-row">
+            <div class="stat-card" id="stat-total">
+                <span class="stat-number">0</span>
+                <span class="stat-label">Total Bugs</span>
+            </div>
+            <div class="stat-card stat-open" id="stat-open">
+                <span class="stat-number">0</span>
+                <span class="stat-label">Abiertos</span>
+            </div>
+            <div class="stat-card stat-progress" id="stat-progress">
+                <span class="stat-number">0</span>
+                <span class="stat-label">En Progreso</span>
+            </div>
+            <div class="stat-card stat-closed" id="stat-closed">
+                <span class="stat-number">0</span>
+                <span class="stat-label">Cerrados</span>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <button class="btn btn-primary" id="new-bug-btn">+ Nuevo Bug</button>
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Buscar bugs...">
+                </div>
+            </div>
+            <div class="toolbar-right">
+                <select id="filter-status" class="select-filter">
+                    <option value="todos">Todos los estados</option>
+                    <option value="abierto">Abierto</option>
+                    <option value="en progreso">En Progreso</option>
+                    <option value="cerrado">Cerrado</option>
+                </select>
+                <select id="filter-priority" class="select-filter">
+                    <option value="todos">Todas las prioridades</option>
+                    <option value="alta">Alta</option>
+                    <option value="media">Media</option>
+                    <option value="baja">Baja</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="bug-table" id="bug-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th class="sortable" data-sort="titulo">Titulo</th>
+                        <th>Prioridad</th>
+                        <th>Estado</th>
+                        <th class="sortable" data-sort="fecha">Fecha</th>
+                        <th>Asignado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="bug-table-body">
+                </tbody>
+            </table>
+            <div class="empty-state" id="empty-state" style="display:none">
+                <p>No se encontraron bugs</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal nuevo/editar bug -->
+    <div class="modal-overlay" id="bug-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Nuevo Bug</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <form id="bug-form">
+                <div class="form-group">
+                    <label for="bug-title">Titulo</label>
+                    <input type="text" id="bug-title" placeholder="Descripcion corta del bug" required>
+                    <span class="field-error" id="title-error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="bug-description">Descripcion</label>
+                    <textarea id="bug-description" rows="3" placeholder="Pasos para reproducir, resultado esperado vs actual..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bug-priority">Prioridad</label>
+                        <select id="bug-priority" required>
+                            <option value="">Seleccionar</option>
+                            <option value="alta">Alta</option>
+                            <option value="media">Media</option>
+                            <option value="baja">Baja</option>
+                        </select>
+                        <span class="field-error" id="priority-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="bug-status">Estado</label>
+                        <select id="bug-status">
+                            <option value="abierto">Abierto</option>
+                            <option value="en progreso">En Progreso</option>
+                            <option value="cerrado">Cerrado</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bug-assignee">Asignado a</label>
+                    <select id="bug-assignee">
+                        <option value="Sin asignar">Sin asignar</option>
+                        <option value="admin">admin</option>
+                        <option value="tester">tester</option>
+                        <option value="dev">dev</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" id="modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="modal-save">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal confirmar eliminacion -->
+    <div class="modal-overlay" id="delete-modal">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h3>Confirmar eliminacion</h3>
+                <button class="modal-close" id="delete-modal-close">&times;</button>
+            </div>
+            <p class="modal-body-text">Estas seguro de que queres eliminar este bug? Esta accion no se puede deshacer.</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" id="delete-cancel">Cancelar</button>
+                <button class="btn btn-danger" id="delete-confirm">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
