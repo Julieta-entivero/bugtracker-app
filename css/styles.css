@@ -305,7 +305,9 @@ body {
     text-align: center;
     padding: 60px 20px;
     color: #9ca3af;
+    font-size: 15px;
 }
+.empty-state p { margin-bottom: 5px; }
 
 /* ===== MODAL ===== */
 .modal-overlay {
